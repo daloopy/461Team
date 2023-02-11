@@ -1,13 +1,19 @@
-use std::env;
-use std::path::Path;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-mod package;
-use package::Package;
-use package::URL;
-use octocrab::Octocrab;
+//use std::env;
+//use std::path::Path;
+//use std::fs::File;
+//use std::io::{BufRead, BufReader};
+//mod package;
+//use package::Package;
+//use package::URL;
+//use octocrab::Octocrab;
+#[no_mangle]
 
-fn main() {
+pub extern "C" fn main() -> i32 {
+    println!("Wrapper works correctly");
+    return 1;
+
+
+    /*
     let args: Vec<String> = env::args().collect(); //returns an iterator
 
     let task = &args[1]; //stores what instruction will be run
@@ -19,7 +25,9 @@ fn main() {
         "test" => test(),
         _ => handle_file(task.as_str()),
     }
+    */
 }
+/*
 fn install(){
     println!("In install");
 }
@@ -30,6 +38,7 @@ fn test(){
     println!("In test");
 }
 
+/*
 fn handle_file(urlfile:&str){
     //println!("inside handle URL");
 
@@ -90,4 +99,11 @@ fn handle_file(urlfile:&str){
         }
         Err(err) => panic!("Problem opening the file: {:?}", err),
     };
+}
+*/
+*/
+
+pub extern "C" fn testfunction()-> i32 {
+    println!("Wrapper works correctly");
+    return 1;
 }

@@ -87,13 +87,21 @@ DEBUG = Some("true")
 CARGO_CFG_TARGET_FEATURE = Some("fxsr,sse,sse2")
 running: "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-fPIC" "-gdwarf-4" "-fno-omit-frame-pointer" "-m64" "-I" "/usr/include" "-Wall" "-Wextra" "-E" "build/expando.c"
 exit status: 0
-cargo:rustc-cfg=osslconf="OPENSSL_NO_EC2M"
-cargo:rustc-cfg=osslconf="OPENSSL_NO_SRP"
-cargo:conf=OPENSSL_NO_EC2M,OPENSSL_NO_SRP
+version: 3_0_2
+cargo:rustc-cfg=osslconf="OPENSSL_NO_IDEA"
+cargo:rustc-cfg=osslconf="OPENSSL_NO_SSL3_METHOD"
+cargo:conf=OPENSSL_NO_IDEA,OPENSSL_NO_SSL3_METHOD
+cargo:rustc-cfg=ossl300
 cargo:rustc-cfg=ossl101
 cargo:rustc-cfg=ossl102
 cargo:rustc-cfg=ossl102f
 cargo:rustc-cfg=ossl102h
-cargo:version_number=100020bf
-cargo:version=102
+cargo:rustc-cfg=ossl110
+cargo:rustc-cfg=ossl110f
+cargo:rustc-cfg=ossl110g
+cargo:rustc-cfg=ossl110h
+cargo:rustc-cfg=ossl111
+cargo:rustc-cfg=ossl111b
+cargo:rustc-cfg=ossl111c
+cargo:version_number=30000020
 cargo:include=/usr/include
