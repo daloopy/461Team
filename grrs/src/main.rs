@@ -6,7 +6,6 @@ mod package;
 use package::Package;
 use package::URL;
 
-#[no_mangle]
  fn main(){
     let args: Vec<String> = env::args().collect(); //returns an iterator
 
