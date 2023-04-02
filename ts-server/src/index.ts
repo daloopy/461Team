@@ -1,4 +1,5 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { filter } from 'lodash';
 import path from 'path';
 
 import {
@@ -6,15 +7,16 @@ import {
     updateRepo,
     deleteRepo,
     findReposByName,
+    getModuleKey,
     findReposByNameAndVersion,
     getAllReposPagenated,
-    createRepoData,
-    downloadRepo
+    getAllRepos,
+    updateRepoPackageAction,
+    createRepoData
 } from "./datastore/modules";
 import { addUser } from "./datastore/users";
-import {deleteEntity, doesIdExistInKind, resetKind} from "./datastore/datastore";
-import {MODULE_KIND} from "./datastore/ds_config";
-
+import {deleteEntity, doesIdExistInKind, resetKind} from "/Users/maxim/Downloads/ECE461_Part2-main/ts-server/src/datastore";
+import {datastore, MODULE_KIND, NAMESPACE} from "/Users/maxim/Downloads/ECE461_Part2-main/ts-server/src/datastore/ds_config";
 
 /* * * * * * * * * * *
  * global variables  *
@@ -22,7 +24,6 @@ import {MODULE_KIND} from "./datastore/ds_config";
 
 const ASSETS_PATH = "../assets";
 const HTML_PATH = ASSETS_PATH + "/html";
-
 const app = express();
 const port = 8080;
 
@@ -258,21 +259,44 @@ app.get('/package/byName/:name', (req, res) => {
     // package DNE
 });
 
-// Delete endpoint
+// Deletes all versions of a package from the datastore with the given name.
 app.delete('/package/byName/:name', async (req, res) => {
-
     // get package name from header
-    // get auth token from header
+    const packageName = req.params.name;
+    
+    // Check if the package name adheres to the naming conventions
+    const filter = /^[a-zA-Z0-9\-._~!$&'()*+,;=]+$/.test(packageName);
+    if (!filter || packageName === '*') {
+        // 400 - invalid package name
+        res.status(400).json({error: 'Invalid package name'});
+    } else {
+        // Retrieve all packages from the datastore with that package name
+        const allPackages = await findReposByName(packageName);
 
-    // 200
-    // package successfully deleted
+        if (allPackages.length === 0) {
+            // 404 - package does not exist
+            res.status(404).json({error: 'Package does not exist'});
+        } else {
+            // Delete all versions of the package from the datastore
 
-    // 400
-    // malformed json/ invalid auth
+            // The map() function takes each package object in allPackages and applies a function to it that 
+            // returns a promise to delete the package from the datastore using the datastore.delete() function. 
+            // The getModuleKey() function is called with the ID of each package to retrieve the datastore key associated 
+            // with that package, which is passed to the datastore.delete() function.
+            const deletionPromises = allPackages.map((pkg: any) => datastore.delete(getModuleKey(pkg.ID)));
 
-    // 404
-    // package DNE
+            // The resulting deletionPromises array contains one promise for each package to be deleted. 
+            // These promises are then passed to Promise.all(), which returns a single promise that resolves 
+            // when all the promises in the array have resolved. The await keyword is used to wait for this promise 
+            // to resolve before continuing with the rest of the code.
+            await Promise.all(deletionPromises);
+
+            // 200 - package successfully deleted
+            res.status(200).json({ message: `All versions of package ${packageName} have been deleted` });
+        }
+    }
 });
+
 
 // Fetch package with Regex
 app.post('/package/byRegEx/:regex', (req, res) => {
